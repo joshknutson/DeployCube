@@ -133,7 +133,14 @@ function Publish-Cube {
         $UserID,
 
         [String] [Parameter(Mandatory = $false)]
-        $Password
+        $Password,
+
+        [String] [Parameter(Mandatory = $false)]
+        $SourceDatabaseName,
+
+        [String] [Parameter(Mandatory = $false)]
+        $SourceServerName
+
 	)
 
 	$global:ErrorActionPreference = 'Stop';
@@ -189,7 +196,7 @@ function Publish-Cube {
             # remove existing log file so we don't show previous error message
             Remove-Item $ErrorLogPath;
         }
-        $ArgList = @(            
+        $ArgList = @(
             "$AsDatabasePath",
             "/s:$ErrorLogPath"
         );
@@ -201,11 +208,12 @@ function Publish-Cube {
             $log = Get-Content ($ErrorLogPath);
             foreach ($line in $log) {
                 Write-Host $line -BackgroundColor Red;
-            }    
+            }
 
         }
         Write-Error $ErrorMsg;
     }
+    Write-Host "##vso[artifact.upload containerfolder=Publish-Cube;artifactname=AnalysisServicesDeploymentExeLog;]$ErrorLogPath"
 }
 
 New-Alias -Name Deploy-Cube -Value Publish-Cube;

@@ -139,10 +139,10 @@ function Update-AnalysisServicesConfig {
             $deploymentTargets.DeploymentTarget.Database = $CubeDatabase;
             $deploymentTargets.DeploymentTarget.Server = $Server;
             $ConnectionString = "Data Source=$Server;Timeout=0;";
-            if ("" -ne "$UserID") {                
-                $ConnectionString += "User ID=$UserID;Password=$Password;Persist Security Info=True;Impersonation Level=Impersonate;"
-            }            
-            #$ConnectionString += "Integrated Security=SSPI;ProtectionLevel=Connect;SSPI=Negotiate;";            
+            if ("" -ne "$UserID") {
+                $ConnectionString += "User ID=$UserID;Password=$Password;Persist Security Info=True;Integrated Security=SSPI;Impersonation Level=Impersonate;"
+            }
+            #$ConnectionString += "Integrated Security=SSPI;ProtectionLevel=Connect;SSPI=Negotiate;";
             $deploymentTargets.DeploymentTarget.ConnectionString = $ConnectionString;
             $deploymentTargets.Save($deploymentTargetsPath);
         } else {
@@ -154,7 +154,7 @@ function Update-AnalysisServicesConfig {
         if (Test-Path($deploymentOptionsPath))
         {
             Write-Output "Altering $ModelName.deploymentoptions"
-                
+
             [xml]$deploymentOptions = [xml](Get-Content $deploymentOptionsPath);
             $deploymentOptions.DeploymentOptions.ProcessingOption = $ProcessingOption;
             if ($TransactionalDeployment) {
@@ -180,7 +180,7 @@ function Update-AnalysisServicesConfig {
             [xml]$configSettings = [xml](Get-Content $configSettingsPath);
 
             $dataSourceNode = $configSettings.ConfigurationSettings.Database.DataSources.DataSource;
-            $dataSourceNode.ConnectionString = Get-SsasSourceConnectionString -DatabaseName $DatabaseName -ConnectionString $dataSourceNode.ConnectionString;
+            $dataSourceNode.ConnectionString = Get-SsasSourceConnectionString -SourceDatabaseName $SourceDatabaseName -SourceServerName $SourceServerName -ExistingConnectionString $dataSourceNode.ConnectionString;
             $configSettings.Save($configSettingsPath);
         }
     } else {
